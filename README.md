@@ -1,5 +1,5 @@
 # html-apps
-Collection of stand-along HTML apps that runs on Chrome browser with CORS extension
+Collection of HTML apps that runs on Chrome browser with CORS extension
 
 Disclaimer: Your use and access of the content in this repository are AT YOUR OWN RISK. You understand and agree that the services and content are provided to you on an "AS IS" and "AS AVAILABLE" basis. This repository and its publisher disclaim all warranties and conditions, whether express or implied, of merchantability, fitness for a particular purpose, or non-infrintement.
 
