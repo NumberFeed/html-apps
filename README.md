@@ -1,6 +1,21 @@
 # html-apps
 Collection of HTML apps that runs on Chrome browser with CORS extension
 
+
+fundholdings1.html 
+- is an xml to datatable parser. It will fetch data from the www.sec.gov website and display the data in table format which can then be exported to csv or xls format.
+
+
+
+
+Requirements: 
+- This file only works with Chrome (Version 92 or greater) and a CORS Extension that is allowed access to https://www.sec.gov/* An example of a CORS extension is "Moesif Origin & CORS Changer" which can be set to access specific sites.
+
+Checksum:
+SHA 256. - shasum -a 256 fundholdings1.html 
+b569f96758b1672697e8915f5aa8f29d3380a475026cc79c2457d041b0bc98e8  
+
+
 Disclaimer: Your use and access of the content in this repository are AT YOUR OWN RISK. You understand and agree that the services and content are provided to you on an "AS IS" and "AS AVAILABLE" basis. This repository and its publisher disclaim all warranties and conditions, whether express or implied, of merchantability, fitness for a particular purpose, or non-infrintement.
 
 This repository and its publisher make no warranty or representation and disclaim all responsibility and liability for: (i) the completeness, accuracy, availability, timeliness, security or reliability of any code and content; (ii) any harm to your computer system, loss of data, or other harm that results from your access to or use of any content.
