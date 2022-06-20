@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<!--[if lte 8]><html class="pre-ie9" lang="en"><![endif]-->
+<!--[if gte IE 9]><!--><html lang="en"><!--<![endif]-->
+<!-- https://htmlboilerplates.com/ -->
+<head>
+  <title>Fund Holdings</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/fontawesome.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css"/>
+
+    <style>
+        th,tr,td,input,span,button,div,li,dt-button {font-size: 12px !Important; }
+        .ui-autocomplete-custom, .ui-autocomplete, .ui-menu-item {
+            background: #fff;
+            z-index: 2;
+        }
+        .ui-helper-hidden-accessible {
+          display: none;
+          background-color: #f0f0f0;
+          z-index: 20;
+        }
+        .ui-autocomplete-custom {
+          background: #87ceeb;
+          z-index: 20;
+        }
+      .soldall {
+          background-color: #ffa900;
+          border-color: #c8633f;
+      }          
+    </style>  
+  <meta name="theme-color" content="">
+</head>
+<body>
+
+<div id="main" style="padding:5px 5px 5px 20px;">
+  <h5>Fund Holdings</h5>
+  <div class="row">
+    <div class="input-group mb-12"  style="width:800px;padding: 5px 5px 5px 15px">
+      <input style="width:333px;" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="Search Fund" name="searchFund" id="searchFund">
+      <div class="input-group-append">
+        &nbsp;&nbsp;<button id="btnSearch" class="btn btn-primary btn-sm" type="submit">Get Latest Holdings</button>
+
+      <select id="numFilings" class="form-select btn-default" style="padding:5px 5px 7px 5px;margin:2px;">
+          <option selected value="2">Latest Filing</option>
+          <option value="5">Last 4 Filings</option>
+      </select>
+
+      <button type='button' class='btn btn-default  btn-sm' onclick='window.open("https://www.sec.gov/cgi-bin/browse-edgar?company=&CIK=&type=13F-HR&owner=exclude&count=20&action=getcurrent", "_blank");'>SEC Link</button>
+      </div>
+
+    </div>
+  </div> 
+
+  <div class="row">
+          <div class="col-lg-12">
+          <div class="tabs-container"  style="overflow:scroll;">
+              <ul class="nav nav-tabs">
+                  <li class="nav-item active" id="t1">
+                    <a class="nav-link" href="#tab-1" aria-expanded="true">
+                      <span id="symbol"></span>&nbsp;</a></li>
+                  <li class="nav-item" id="t2">
+                    <a  class="nav-link"  href="#tab-2" aria-expanded="false"><span onclick="getLatestFilers()">Latest Filers</span></a>
+                  </li>
+                  <li class="nav-item" id="t3">
+                    <a  class="nav-link"  id="proc_msg" href="#tab-3" aria-expanded="false">CORS Required</a>
+                  </li>
+              </ul>
+              <div class="tab-content">
+                <div id="tab-1" class="tab-pane">
+                  <div class="hpanel stats">
+                    <div class="panel-body h-800" style="overflow:scroll;">
+                        <table id="dtable1" class="display nowrap stripe"   cellspacing="0" width="100%">
+                          <thead></thead>
+                          <tfoot></tfoot>
+                          <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="panel-footer"></div>
+                  </div>
+                </div>
+
+                <div id="tab-2" class="tab-pane">
+                  <div class="hpanel stats">
+                    <div class="panel-body h-800">
+                        <table id="dtable2" class="display nowrap stripe"   cellspacing="0" width="100%">
+                          <thead></thead>
+                          <tfoot></tfoot>
+                          <tbody></tbody>
+                        </table>
+                    </div>
+                  </div>
+                  <div class="panel-footer"></div>
+                </div>
+
+                <div id="tab-3" class="tab-pane">
+                  <div class="hpanel stats"></div>
+                  <div class="panel-footer">&nbsp;</div>
+                </div>
+
+              </div>
+              </div>
+          </div>
+          </div>
+ 
+    </div>
+
+
+    <div class="row" style="padding-top: 20px">
+      <div class="col-lg-1">&nbsp;</div>
+      <div class="col-lg-10">
+        <div class="panel-footer"><br/><span style="font-size:11px">
+<b>Disclaimer</b>: 
+This content is purely for informational and educational purposes. Your use and access of this content are AT YOUR OWN RISK. You understand and agree that this  is provided to you on an "AS IS" and "AS AVAILABLE" basis. The publisher makes no warranty or representation and disclaim all responsibility and liability for: (i) the completeness, accuracy, availability, timeliness, security or reliability of any content; (ii) any harm to your computer system, loss of data, or other harm that results from your access to or use of this content and its links. 
+
+Under no circumstances will the publisher be held responsible or liable in any way for any claims, damages, losses, expenses, costs or liabilities whatsoever (including without limitation, any direct or indirect damages for loss of profits, business interruption or loss of information) resulting or arising directly or indirectly from your use of or inability to use this content or any sites linked to it, or from your reliance on the information in this content.
+</style>
+        </div>
+      </div>  
+      <div class="col-lg-1">&nbsp;</div>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js" crossorigin="anonymous"></script>
+
+<script src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.13.0-rc.3/jquery-ui.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript">
+var arrCIK_Lookup = ['CEDAR ROCK CAPITAL LTD','0001315765','ROUTE ONE INVESTMENT COMPANY, L.P.','0001512171','NIGHT OWL CAPITAL MANAGEMENT, LLC','0001410833','AKRE CAPITAL MANAGEMENT LLC','0001112520','GENERATION INVESTMENT MANAGEMENT LLP','0001375534','COATUE MANAGEMENT LLC','0001135730','ALTIMETER CAPITAL MANAGEMENT, LP','0001541617','EAGLE CAPITAL MANAGEMENT LLC','0000945631','LONE PINE CAPITAL LLC','0001061165','YACKTMAN ASSET MANAGEMENT LP','0000905567','CRITERION CAPITAL MANAGEMENT LLC','0001282550','BLOOM TREE PARTNERS, LLC','0001567752','SANDS CAPITAL MANAGEMENT, LLC','0001020066','GREENHAVEN ASSOCIATES INC','0000846222','ABRAMS BISON INVESTMENTS, LLC','0001317588','Force Capital Management LLC','0001317601','TIGER GLOBAL MANAGEMENT LLC','0001167483','BILL & MELINDA GATES FOUNDATION TRUST','0001166559','CHILTON INVESTMENT CO LLC','0001332632','Columbus Hill Capital Management, L.P.','0001384982','Miura Global Management, LLC','0001352272','HealthCor Management, L.P.','0001343781','HILLHOUSE CAPITAL MANAGEMENT, LTD.','0001510589','PIONEER INVESTMENT MANAGEMENT INC /ADV','0000734072','PRIMECAP MANAGEMENT CO/CA/','0000763212','STEELHEAD PARTNERS LLC','0001133521','ROUMELL ASSET MANAGEMENT, LLC','0001331693','SHAH CAPITAL MANAGEMENT','0001383838','S SQUARED TECHNOLOGY, LLC','0001322924','Osmium Partners, LLC','0001316729','CARTICA MANAGEMENT, LLC','0001600011','BAIN CAPITAL INVESTORS LLC','0001040508','NINE TEN CAPITAL MANAGEMENT LLC','0001635236','ANCIENT ART, L.P.','0001426749','TRIGRAN INVESTMENTS, INC.','0001336800','LILLY ENDOWMENT INC','0000316011','ARCHON CAPITAL MANAGEMENT LLC','0001398825','MATTHEWS INTERNATIONAL CAPITAL MANAGEMENT LLC','0001028074','MAK CAPITAL ONE LLC','0001385702','BROADWOOD CAPITAL INC','0001278387','CONTOUR ASSET MANAGEMENT LLC','0001510669','VALIANT CAPITAL MANAGEMENT, L.P.','0001452689','HARVEY PARTNERS, LLC','0001406484','THELEME PARTNERS LLP','0001511881','VISTA EQUITY PARTNERS MANAGEMENT, LLC','0001569532','SCGE MANAGEMENT, L.P.','0001537530','KYLIN MANAGEMENT LLC','0001512384','AXEL CAPITAL MANAGEMENT, LLC','0001478997','OAKTOP CAPITAL MANAGEMENT II, L.P.','0001550660','GENERAL ATLANTIC LLC','0001017645','3G CAPITAL PARTNERS LP','0001421669','12 WEST CAPITAL MANAGEMENT LP','0001540531','SRS INVESTMENT MANAGEMENT, LLC','0001503174','CROSSLINK CAPITAL INC','0001104329','BRANDYWINE MANAGERS, LLC','0001135121','RGM CAPITAL, LLC','0001323953','TEKNE CAPITAL MANAGEMENT, LLC','0001558971','TB ALTERNATIVE ASSETS LTD.','0001483503','GOODNOW INVESTMENT GROUP, LLC','0001362255','ADAMS STREET PARTNERS LLC','0001193586','GEORGE KAISER FAMILY FOUNDATION','0001265376','CENTRAL ASSET INVESTMENTS & MANAGEMENT HOLDINGS (HK) LTD','0001583672','VOLEON CAPITAL MANAGEMENT LP','0001479847','DIKER MANAGEMENT LLC','0001276525','ANTIPODEAN ADVISORS LLC','0001512566','ALPINVEST PARTNERS B.V.','0001512910','FRESHFORD CAPITAL MANAGEMENT, LLC','0001459270','GAGNON ADVISORS, LLC','0001599466','BLOOM TREE PARTNERS, LLC','0001567752','TYBOURNE CAPITAL MANAGEMENT (HK) LTD','0001553936','SHANNON RIVER FUND MANAGEMENT LLC','0001301050','DORSAL CAPITAL MANAGEMENT, LLC','0001547007','DRAGONEER INVESTMENT GROUP, LLC','0001602189','ALLEN OPERATIONS LLC','0001389544','GREENWOODS ASSET MANAGEMENT LTD','0001577133','Scion Asset Management, LLC','0001649339','Cascade Investment Advisors, Inc.','0001681490','BERKSHIRE HATHAWAY INC','0001067983','Pershing Square Capital Management, L.P.','0001336528','Hill Path Capital LP','0001676292','MASTERS CAPITAL MANAGEMENT LLC','0001104186','GRATIA CAPITAL, LLC','0001599793','PECONIC PARTNERS LLC','0001050464','Bridgewater Associates, LP','0001350694','ARK Investment Management LLC','0001697748'];
+
+   var availableTags = [
+      "STEPSTONE GROUP LP","10-15 ASSOCIATES, INC.","1060 CAPITAL, LLC","12 WEST CAPITAL MANAGEMENT LP","ZWJ INVESTMENT COUNSEL INC","CEDAR ROCK CAPITAL LTD","ROUTE ONE INVESTMENT COMPANY, L.P.","NIGHT OWL CAPITAL MANAGEMENT, LLC","AKRE CAPITAL MANAGEMENT LLC","GENERATION INVESTMENT MANAGEMENT LLP","COATUE MANAGEMENT LLC","ALTIMETER CAPITAL MANAGEMENT, LP","EAGLE CAPITAL MANAGEMENT LLC","LONE PINE CAPITAL LLC","YACKTMAN ASSET MANAGEMENT LP","CRITERION CAPITAL MANAGEMENT LLC","BLOOM TREE PARTNERS, LLC","Scion Asset Management, LLC","Cascade Investment Advisors, Inc.","BERKSHIRE HATHAWAY INC","Pershing Square Capital Management, L.P.","Hill Path Capital LP","MASTERS CAPITAL MANAGEMENT LLC","Bridgewater Associates, LP","ARK Investment Management LLC"
+    ];
+
+</script>
+<script type="text/javascript">
+ function getParameterByName(name, url) {
+        if (!url) {
+            url = window.location.href;
+        }
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    var now_date = new Date();
+
+    function clean_txt(val){
+          val = val.trim();
+          return val.replace(/,/g, '');
+      }
+
+    function rand_sec(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function wsleep(ms,min,max){
+        var r = rand_sec(min,max);
+        ms = r * ms;
+        var start = new Date().getTime();
+        var end = start;
+        while(end < start + ms) {
+            end = new Date().getTime();
+        }
+    }
+
+    function wsleepx(ms){
+        var start = new Date().getTime();
+        var end = start;
+        while(end < start + ms) {
+            end = new Date().getTime();
+        }
+    }
+     function convertDateMDY(dte) {
+        //from YYYYMMDD
+        var val = dte + ' ';
+        return val.substr(4,2)+ '/' + val.substr(6,2) + '/' + val.substr(0,4);
+    }
+    Date.prototype.yyyymmdd = function() {
+        var mm = this.getMonth() + 1; // getMonth() is zero-based
+        var dd = this.getDate();
+      
+        return [this.getFullYear(),
+                (mm>9 ? '' : '0') + mm,
+                (dd>9 ? '' : '0') + dd
+               ].join('-');
+      };
+
+    var fnd_data = [];
+    var CIK_Hist = [];
+    var subTables = [];
+    var page_response_count = 0;
+    var cusip_sym_xref = [];
+    var fnd_cik_xref = [];
+    var fnd_cik_xref2 = [];
+    var cikScore = '';
+    var limitFlg = 0;     
+    var topComp = [];
+    var fetchLatest = 0;
+
+    function loadXrefArray() {
+    try {
+            var initval = '00846U101,A';
+      cusip_sym_xref = initval.split(',');
+        }
+        catch (e) {
+            console.log('loadXrefArray error catch:' + e);
+            //return null;
+        }
+
+    try {
+            
+        var initval2 = ''; 
+            fnd_cik_xref = initval2.split('|');  
+            var initval3 = '|0|0|0';
+            fnd_cik_xref2 = initval3.split('|'); 
+
+            console.log('loading xref score');
+            var blist = $('#bestperf');
+            for(var i = 0; i < fnd_cik_xref.length; i=i+3) {
+                var li = $('<li/>')
+                    .addClass('ui-menu-item')
+                    .attr('role', 'menuitem')
+                    .appendTo(blist);
+                var aaa = $('<a/>')
+                    .addClass('ui-all')
+                    .text(fnd_cik_xref[i]+ ' [' +fnd_cik_xref[i+2] + ']')
+                    .appendTo(li);  
+                topComp.push(fnd_cik_xref[i]);    
+            }
+            console.log('loading xref score done');
+
+        } catch (e) {
+            console.log('loadXrefArray error catch:' + e);
+            //return null;
+        }
+    }
+
+
+    async function getCIK(uri,comp) {
+        var numP = [];
+        var maxCIK = 0;
+        comp = comp.replace(/%20/g,' ');
+        //console.log('getCIK : ' + comp + ' | ' + uri);
+
+        try {
+            var row_str = '';
+            var numPagesx = await $.get(uri, function(data) {
+                //console.log(data);
+                var tableObject = $('.companyInfo span a', data).map(function(i) {
+                    row_str = (($(this).text()).replace('(see all company filings)','')).trim();
+                    numP.push(row_str);
+                }).get();
+            }); 
+            console.log(numP);
+
+            if (numP.length == 0) {
+                numPages2 = await $.get(uri, function(data) {
+                    var numPages = 0;
+                    var tableObject1 = $('#seriesDiv > table', data).map(function(i) {
+                        row_str = '0';
+                        $(this).find('tr').each(function(ii) {
+                            var col_ctr = 0;
+                            var end_loop = 0;
+                            $(this).find('td').each(function(i) {
+                                col_ctr++;
+                                if (end_loop == 0) {
+                                    if (col_ctr == 1) { //col 1 is cik number
+                                        //if (parseInt($(this).text()) > 0) {
+                                        //  maxCIK = parseInt($(this).text());
+                                        //  if (maxCIK > parseInt(row_str)) {
+                                              row_str = ($(this).text());
+                                        //    } 
+                                        //}
+                                    }
+                                    if (col_ctr == 2) { //col 2 is company name 
+                                        if (($(this).text()).trim() == comp) {
+                                            numP.push(row_str);
+                                            end_loop = 1;
+                                        }
+                                    }
+                                }        
+                            });
+                        });
+                        //numP.push(row_str);
+                    }).get();
+                });    
+            }
+            console.log(numP);
+
+            return numP;      
+        }
+        catch (e) {
+            console.log('getCIK err:' + e);
+            return null;
+        }
+    }
+
+    async function get13F(uri) {
+        var numP = [];
+        try {
+            //wsleep(188,1,8);
+            var row_str = '';
+            console.log('get13F:'+uri);
+            if (numP.length == 0) {
+                numPages2 = await $.get(uri, function(data) {
+                    var numPages = 0;
+                    var tableObject1 = $('#seriesDiv > table', data).map(function(i) {
+                        row_str = '';
+                        
+                        $(this).find('tr').each(function(ii) {
+                            var td_ctr = 0;    
+                            $(this).find('td').each(function(iii) {
+                                td_ctr++;
+                                //get Documents link button (2nd column)
+                                $(this).find('#documentsbutton').each(function(i2) {
+                                    row_str = $(this)[0].getAttribute('href');
+                                    //console.log(row_str);
+                                });
+                                //get Filling Date (4th column)
+                                if (td_ctr == 4) {
+                                  row_str += '|'+($(this).text())+'|';
+                                }
+                            });
+                            //console.log(row_str);
+                            numP.push(row_str);
+                        });
+                        //numP.push(row_str);
+                    }).get();
+                });    
+            }
+
+            return numP;      
+        }
+        catch (e) {
+            console.log('get13F err:' + e);
+            return null;
+        }
+    }
+ 
+    async function getXMLlink(uri) {
+      //this gets the infotable link because sometimes its not infotable                       
+        var numP = [];
+        try {
+            var row_str = '';
+            if (numP.length == 0) {
+                numPages2 = await $.get(uri, function(data) {
+                    var numPages = 0;
+                    var found_flag = 0;
+
+                    var tableObject1 = $('#formDiv > div > table', data).map(function(i) {
+                        row_str = '';
+                        var tr_ctr = 0; 
+                        $(this).find('tr').each(function(ii) {
+                          tr_ctr++;
+                            var td_ctr = 0;    
+                            //console.log('nav tr:' + tr_ctr + ' = ' + $(this).text());
+                          if (tr_ctr == 5) {
+
+                            $(this).find('td').each(function(iii) {
+                                td_ctr++;                                
+                                //get document column in col3 
+                               //console.log('nav tr:' + tr_ctr + ' td:' + td_ctr  + ' = ' + $(this).text() + ' fnd: ' + $(this)[0].getAttribute('href'));
+
+                                if (td_ctr == 3) {
+                                  if (($(this).text()).indexOf('.xml') > -1) {
+                                    $(this).find('a').each(function(i3) {
+                                       
+                                           var attrib = $(this)[0].getAttribute('href');
+                                           if (attrib != null) {
+                                         row_str = attrib;
+                                       } 
+                                });
+                                  }
+                                }
+
+                            });
+                          }  
+                            
+                            if(row_str!= '') {
+                              numP.push(row_str);
+                              console.log(row_str);
+                          }
+                        });
+                        //numP.push(row_str);
+                    }).get();
+                });    
+            }
+
+            return numP;      
+        }
+        catch (e) {
+            console.log('get13F err:' + e);
+            return null;
+        }     
+    }    
+
+    async function getSymbol(cusip) {
+      var uri = '.';
+      var res = [];
+      console.log('getSymbol: '+cusip)
+        try {
+            $.ajaxSetup({
+                async: true,
+                headers:null
+            });
+            await $.get(uri, function(data) {             
+              var n = data.indexOf('width="20%"><font>');
+              var sym = (data.slice(n+18,n+28)).replace('\<\/td\>','');
+              console.log('found symbol1 '+ sym);
+              res.push(sym);
+            });    
+            return res[0];
+         }
+        catch (e) {
+            console.log('getSymbol err:' + e);
+            return null;
+        }     
+    }
+
+    async function getXML(uri) {
+        var numP = [];
+        var xmllink = ''; 
+
+        try {
+            xmllink = 'infotable.xml'; 
+            console.log('xml-uri: ' + uri+xmllink);
+            await $.get(uri+xmllink, function(data) {
+                if (data.indexOf('AccessDenied') < 0) { 
+                    numP.push(data);
+                    numP.push('xslForm13F_X01/infotable.xml');
+                }
+            });    
+         }
+        catch (e) {
+            console.log(' :' + e);
+            //return null;
+        }
+
+        try {
+            if (numP.length == 0) {
+                xmllink = 'form13fInfoTable.xml';
+                console.log('xml-uri: ' + uri+xmllink);
+                await $.get(uri+xmllink, function(data) {
+                    numP.push(data);
+                    numP.push('xslForm13F_X01/form13fInfoTable.xml');
+                });    
+            }
+            //return numP;   
+        }
+        catch (e) {
+            console.log('getXML err:' + e);
+            //return null;
+        }
+
+        try {
+            if (numP.length == 0) {
+                xmllink = 'Form13FInfoTable.xml';
+                console.log('xml-uri: ' + uri+xmllink);
+                await $.get(uri+xmllink, function(data) {
+                    numP.push(data);
+                    numP.push('Form13FInfoTable.xml');
+                });    
+            }
+            //return numP;   
+        }
+        catch (e) {
+            console.log('getXML err:' + e);
+            return null;
+        }
+
+        return numP;
+
+    }
+
+    async function getXML2(uri) {
+        var numP = [];
+        var xmllink = ''; 
+
+        try {
+            console.log('xml-uri: ' + uri);
+            await $.get(uri, function(data) {
+                //if (data.indexOf('AccessDenied') < 0) { 
+                    numP.push(data);
+                    numP.push(uri);
+                //}
+            });    
+         }
+        catch (e) {
+            console.log('getXML err:' + e);
+            return null;
+        } 
+
+        return numP;
+
+    }
+
+    function xmlToJson(xml,cik,fdate,NoStsFlag,CompName,WhaleScore) {
+        var holdings = [];
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(xml, "text/xml");
+        try {
+
+            // <infoTable>
+            // <nameOfIssuer>PARTY CITY HOLDCO INC</nameOfIssuer>
+            // <titleOfClass>COM</titleOfClass>
+            // <cusip>702149105</cusip>
+            // <value>7645</value>
+            // <shrsOrPrnAmt>
+            // <sshPrnamt>3267077</sshPrnamt>
+            // <sshPrnamtType>SH</sshPrnamtType>
+            // </shrsOrPrnAmt>
+            // <investmentDiscretion>SOLE</investmentDiscretion>
+            // <otherManager>N/A</otherManager>
+            // <votingAuthority>
+            // <Sole>3267077</Sole>
+            // <Shared>0</Shared>
+            // <None>0</None>
+            // </votingAuthority>
+            // </infoTable>
+
+            const errorNode = doc.querySelector("parsererror");
+            if (errorNode) {
+              console.log("error while parsing xml in xmlToJson");
+              return holdings;
+            } else {
+              //console.log(doc.documentElement.nodeName); //returns root node "informationTable"
+            }
+            var r = doc.documentElement;
+            var c = r.childNodes;
+            var res='',res2='';
+            for(var i =0; i< c.length; i++) {
+                var fld = c[i].childNodes;
+                //console.log(fld);
+                res = '';
+                var t = '';
+                for(var ii =0; ii< fld.length; ii++) {
+                     //0=WALKME LTD|1=ORD SHS|2=M97628107|3=308414|4=10366855      SH|5=DFND|6=10366855      0      0|
+                     //ARDELYX INC | 039697107 | 11 | 1603 | SH
+                     //UIPATH INC|90364P105|97487|1853005|SH
+                     //WALKME LTD | M97628107 | 308414 ||
+                     if (fld[ii].nodeName != "\#text") {
+                        t = (fld[ii].textContent).replace(/\n/g,'').trim();
+                        if (t != null) {
+                          res += t + ' | ';
+                        }
+                     }   
+                }
+                try {
+                  //console.log(res);
+                if (res != null) {
+                  var r = res.split(' | ');
+                  if (r.length>6) {
+                    var r2 = (r[4]).split(' ');
+                    var typ = '';
+                    var typ2 = '';
+                    try{
+                      typ = (r2[r2.length-1]).toLowerCase();  
+                      if (typ.indexOf('sh')>-1) { typ = 'SH' }
+                      else if (typ.indexOf('prn')>-1) { typ = 'PRN' }
+
+                      typ2 = (r[5]); //put or call
+                      if (typ2.indexOf('SOLE')>-1) { typ2 = 'Sole' }
+                      if (typ2.indexOf('Put')>-1) { typ2 = '\/Put' }
+                      else if (typ2.indexOf('Call')>-1) { typ2 = '\/Call' }
+                      else { typ2 = '-'+typ2 }  
+                    }catch(e){ console.log(e) }
+                      
+                    typ += typ2;
+                    res = r[0] + ' | '+r[2] +' | '+r[3] +' | '+r2[0] +' | '+typ; 
+                    //res = r[0] + '  ('+r[1]+' - '+r[5]+') | '+r[2] +' | '+r[3] +' | '+r2[0] +' | '+r2[r2.length-1]; 
+                    //console.log(res);
+                    holdings.push(res);
+                  }
+                }
+                }catch(e){ console.log(e) }
+            }    
+            return holdings;
+        } catch (e) {
+            console.log('err getAll:' + e);
+            holdings = [];
+            return holdings;
+        }            
+    }    
+
+
+ 
+
+    function convDateInt(strDate) {
+        return  parseInt(strDate.replace(/-/g,''));
+    }
+
+    function treatAsUTC(date) {
+        var result = new Date(date);
+        result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
+        return result;
+    }
+
+    function daysBetween(startDate, endDate) {
+
+        try {
+          //var millisecondsPerDay = 24 * 60 * 60 * 1000;
+          //return (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay;
+          //startDate = '2021-02-16'
+            var sDate = startDate.split('-');
+            var yr1 = parseInt(sDate[0]);
+            var mo1 = parseInt(sDate[1]);
+            var dt1 = parseInt(sDate[2]);
+            var sDate2 = endDate.split('-');
+            var yr2 = parseInt(sDate2[0]);
+            var mo2 = parseInt(sDate2[1]);
+            var dt2 = parseInt(sDate2[2]);
+
+            const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+            //const firstDate = new Date(2008, 1, 12);
+            //const secondDate = new Date(2008, 1, 22);
+
+            const firstDate  = new Date(yr1, mo1, dt1);
+            const secondDate = new Date(yr2, mo2, dt2);
+
+            const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
+            return diffDays;
+        } catch(e) {
+            return 0;
+        }
+
+    }
+
+
+    function addSoldAllItems(j,fDate) {
+        try {
+            var dteCurr = fDate;
+            var prevQtrDate = '';
+            var closestDateDiff = 300;
+            for (var i=0; i<CIK_Hist.length; i++) {
+                //console.log(CIK_Hist[i]);
+                arrHist = (CIK_Hist[i]).split('|');            
+                var dteHist = arrHist[1]; //Date.parse(arrHist[1]);
+                var daysdiff = daysBetween(dteHist, dteCurr);
+                //console.log('comp dte: ' + dteCurr + ' vs ' + dteHist + ' = ' + daysdiff);
+                if (isNaN(daysdiff)) {daysdiff=300;}
+                if (daysdiff < closestDateDiff && daysdiff > 0) {
+                    closestDateDiff = daysdiff;
+                    //if(daysdiff > 10 && daysdiff < 160)  {    
+                    prevQtrDate = (dteHist + ' ').trim();                      
+                    //break;
+                }
+            }
+            //console.log('prevDate :' + prevQtrDate);
+            if (prevQtrDate != '') {
+                var arrPrevQtr = [];
+                var arrPrevQtrCusip = [];
+                for (var i=0; i<CIK_Hist.length; i++) {
+                    arrHist = (CIK_Hist[i]).split('|');
+                    //console.log('dtehist compr :' + arrHist[1] + '|' + prevQtrDate); 
+                    if (arrHist[1] == prevQtrDate) {
+                        arrPrevQtr.push(CIK_Hist[i]);
+                        arrPrevQtrCusip.push(arrHist[3]);
+                    }
+                }
+                console.log('old cusip length: ' + arrPrevQtrCusip.length + '|' +  + arrPrevQtr.length);
+                for (var i=0; i<arrPrevQtrCusip.length; i++) {
+                    var soldAll = 1;
+                    for (var ii=0; ii<j.length; ii++) {
+                        var arrJ = (j[ii]).split('|');
+                        //console.log('prev compr :' + (arrPrevQtrCusip[i]).toUpperCase() + ' | ' + (arrJ[1]).toUpperCase());       
+                        if ((arrPrevQtrCusip[i]).toUpperCase() == (arrJ[1]).toUpperCase()) {
+                            soldAll = 0;
+                            break;
+                        }    
+                    }
+                    if (soldAll == 1) {
+                        //elements: issuer,cusip,value,shares-amount,%invest,UpDown,%change
+                        var j2 = (arrPrevQtr[i]).split('|');
+                        //console.log('append j: '+ j2[2] +'|'+ j2[3] +'|0|0|0|-|Sold All|-100');
+                        j.push(j2[2] +'|'+ j2[3] +'|0|0|0|-|<span class="label soldall m-l-5">Sold All</span>|-100|');
+                    }
+                }
+                return j;
+
+            } else {
+                return j; //return old jObj
+            }
+
+        }catch(e) { 
+            console.log('addSoldAllItems err' + e);
+            return j; 
+        }
+    }
+
+
+    //determine if shared have increased or decreased by finding previous array entry
+    function isShareUpDown(currHist) {
+
+        //console.log('isShareUpDown: ' + currHist);
+        var change = '?';
+        try {
+            //CIK_Hist is formatted: 0=cik, 1=fdate, 2=issuer, 3=cusip, 4=value, 5=sharesamt);
+            CIK_Hist.sort();
+            
+            var arrCurr = [];
+            var arrHist = [];
+
+            if (CIK_Hist.length > 0) {     
+                arrCurr = currHist.split('|');
+                var n = -1; //CIK_Hist.length-1;
+                //console.log(clen = CIK_Hist.length);
+
+                var clen = CIK_Hist.length - 1;
+                if (clen.length > 3000) { clen = 3000; }
+
+                for (var i=clen; i>=0; i--) {
+                    arrHist = (CIK_Hist[i]).split('|');
+
+                    var dteCurr = arrCurr[1]; //Date.parse(arrCurr[1]);
+                    var dteHist = arrHist[1]; //Date.parse(arrHist[1]);
+                    var daydiff = daysBetween(dteHist, dteCurr);
+                    if (isNaN(daydiff)) {daydiff=0;}
+
+                    //element 0 is Company CIK, element 3 is Holding cusip/cik                             
+                    if(arrHist[0] == arrCurr[0] && arrHist[3] == arrCurr[3] && daydiff > 10 && daydiff < 160)  {    
+                       n = i;
+                       try {
+                         //console.log('old vs new date : '+arrHist[1] +' vs '+ arrCurr[1]); 
+                         //console.log('age>1: '+arrHist[1] +' vs '+ arrCurr[1] + ' = ' + daydiff); 
+                       } catch(e) {}                         
+                       break;
+                    }
+                }   
+
+                if (n == -1) { return 'NewQ'; }
+                 arrHist = (CIK_Hist[n]).split('|');
+                 //find position of last entry of matching cusip
+                 //if (arrCurr[0] == arrHist[0] && parseInt(arrHist[1]) < parseInt(arrCurr[1]) )  {
+                  try {  
+                      //console.log('age>2: ' + arrHist +' vs '+ arrCurr + ' |index match: ' + n);  
+                      // [0] 0001541617|              -
+                      // [1] 2021-02-16|              -filing date 
+                      // [2] ALIBABA GROUP HLDG LTD|  -issuer 
+                      // [3] 01609W102| -cik
+                      // [4] 256003|    -val
+                      // [5] 1100000|   -sharesAmt
+                      // [6] SH         -type 
+
+                       var histShares = parseInt(arrHist[5]);
+                       var currShares = parseInt(arrCurr[5]);
+                       //console.log('age>3: ' + histShares +' vs '+ currShares); 
+                       if (histShares == currShares) { 
+                           change = 'No Change' ;
+                           //return 'No Change';
+                       } else if (histShares > currShares) { 
+                           var percD = ((histShares - currShares) / histShares)*100;
+                           change = 'DownQ ' +  percD.toFixed(2) + '%';
+                       } else if (histShares < currShares) {
+                           var percU = ((currShares - histShares) / histShares )*100;
+                           change = 'UpQ ' +  percU.toFixed(2) + '%';
+                       }
+                       //console.log('age>4: ' + histShares +' vs '+ currShares + ' = ' + change);
+                   } catch(e) {
+                      console.log('err03 isShareUpDown: ' + e.message)
+                   }
+
+                //}
+                //Positions of fields: CIKnum + ' | ' + convDateInt(filingDate[ii]) ' | ' + nameOfIssuer + ' | ' + cusip + ' | ' + sshPrnamt'
+            }
+            //console.log('UpDownCurr: ' + arrCurr + ' res: ' + change);
+            //console.log('UpDownHist: ' + arrHist);
+            if (change == null || change == '') { change = '?'}
+
+        } catch(e) {
+            console.log('isShareUpDown: ' + e.message)             
+        }    
+
+        return change;
+    }
+
+   function getSymXref(find) {
+    var index = -1
+    for(var i = 0; i < cusip_sym_xref.length; i++) {
+        if(cusip_sym_xref[i] === find) {
+            //index = i;
+            return i;
+            break;
+        }
+    }
+    return null;
+   }    
+
+    async function getCIK_New(uri,comp) {
+        var numP = [];
+        var maxCIK = 0;
+        comp = comp.replace(/%20/g,' ');
+        console.log('getCIK : ' + comp + ' | ' + uri);
+        wsleep(188,1,8);
+
+        try {
+
+            //find in array first 
+            for(var i = 0; i < arrCIK_Lookup.length; i=i+2) {
+                if( (arrCIK_Lookup[i]).toLowerCase() == comp.toLowerCase() ) {
+                    return arrCIK_Lookup[i+1];
+                }
+            }
+
+            var row_str = '';
+            var numPagesx = await $.get(uri, function(data) {
+                //console.log(data);
+                var tableObject = $('.companyInfo span a', data).map(function(i) {
+                    row_str = (($(this).text()).replace('(see all company filings)','')).trim();
+                    numP.push(row_str);
+                }).get();
+            }); 
+            console.log(numP);
+
+            if (numP.length == 0) {
+                numPages2 = await $.get(uri, function(data) {
+                    var numPages = 0;
+                    var tableObject1 = $('#seriesDiv > table', data).map(function(i) {
+                        row_str = '0';
+                        $(this).find('tr').each(function(ii) {
+                            var col_ctr = 0;
+                            var end_loop = 0;
+                            $(this).find('td').each(function(i) {
+                                col_ctr++;
+                                if (end_loop == 0) {
+                                    if (col_ctr == 1) { //col 1 is cik number
+                                        //if (parseInt($(this).text()) > 0) {
+                                        //  maxCIK = parseInt($(this).text());
+                                        //  if (maxCIK > parseInt(row_str)) {
+                                                row_str = ($(this).text());
+                                        //    } 
+                                        //}
+                                    }
+                                    if (col_ctr == 2) { //col 2 is company name 
+                                        if (($(this).text()).trim() == comp) {
+                                            numP.push(row_str);
+                                            end_loop = 1;
+                                        }
+                                    }
+                                }        
+                            });
+                        });
+                        //numP.push(row_str);
+                    }).get();
+                });    
+            }
+            console.log(numP);
+
+            return numP;      
+        }
+        catch (e) {
+            console.log('getCIK err:' + e);
+            return null;
+        }
+    } 
+
+   function getFScoreXref(find) {
+        var index = -1
+        var val = 0;
+        var valstr = '';
+        find = find.toUpperCase();
+        for(var i = 0; i < fnd_cik_xref.length; i=i+3) {
+            //console.log(fnd_cik_xref[i]);
+            //if(((fnd_cik_xref[i]).trim()).toUpperCase === ((find).trim()).toUpperCase) {
+            if(fnd_cik_xref[i] === find) {
+                console.log('score found: '+fnd_cik_xref[i]);
+                val = parseFloat(fnd_cik_xref[i+2]);
+                if (val < 1) {
+                    valstr = '<span style="color:red;font-weight:bold" >' + fnd_cik_xref[i+2] + '<\/span>';
+                }
+                if (val > 8) {
+                    valstr = '<span style="color:green;font-weight:bold" >' + fnd_cik_xref[i+2] + '<\/span>';
+                }
+                return valstr;
+                break;
+            }
+        }
+        console.log('score not found');
+        return "0";
+   }        
+
+   function getScoreXref2(find) {
+        //this takes the cik number instead of name
+        var index = -1
+        var val = 0;
+        var valstr = '';
+        for(var i = 0; i < fnd_cik_xref2.length; i=i+2) {
+            if(fnd_cik_xref2[i] === find) {
+                console.log('score found: '+fnd_cik_xref2[i]);
+                val = parseFloat(fnd_cik_xref2[i+1]);
+                if (val < 1) {
+                    valstr = '<span style="color:red;font-weight:bold" >' + fnd_cik_xref2[i+1] + '<\/span>';
+                }
+                if (val > 8) {
+                    valstr = '<span style="color:green;font-weight:bold" >' + fnd_cik_xref2[i+1] + '<\/span>';
+                }
+                return valstr;
+                break;
+            }
+        }
+        console.log('score2 not found');
+        return "0";
+   }  
+
+   function showStocks(f) {
+          $('#searchFund').val(f);
+          $('#btnSearch').click();
+          $('.nav-tabs a[href="#tab-1"]').tab('show');          
+   }
+
+
+
+    async function getLatestFilers() {
+    //data table for latest filings
+        if (fetchLatest==1) {return;}
+        fetchLatest = 1;
+
+        if ( $.fn.DataTable.isDataTable('#dtable2') ) {
+            $('#dtable2').DataTable().destroy();
+        }
+        $('#dtable2 tbody').empty();
+        $('#dtable2 thead').empty();
+        jQuery.ajaxSetup({
+            async: true,
+            dataType: 'text'
+        });
+        var rowx = '<tr>' +
+                   '<th>Filer</th>' +
+                   '<th>CIK___Number</th>' +
+                   '<th>Filing Date</th>' +
+                   '<th># Holdings</th>' +
+                   '<th>Total Value</th>' +
+                   '</tr>';
+        $('#dtable2 > thead:last').append(rowx);
+        var tab = await getLFtable();
+        console.log('latest numrows: '+tab.length);
+
+        var filers = [];
+        var f_lines = [];
+        for (var i =0; i < tab.length; i++) {
+            var col = (tab[i]).split('|');
+            var filer = ((col[0]) + ' ').trim();
+                filer = filer.substr(filer.indexOf(' - ')+3);
+            //var filer = (col[0]).replace('13F-HR - ','');
+                filer = filer.substring(0,filer.indexOf('(0')-1);
+                filer = filer.toUpperCase().trim();
+            var pos1  = (col[0]).indexOf('(0')+1;
+            var cik   = (col[0]).substring(pos1,(col[0]).indexOf(')',pos1));
+            filers.push(filer+'|'+cik); 
+
+            var fdate = (col[1]).substring(0,10);
+            var fndscore = 0; 
+
+            $('#proc_msg').text('fetching..'+cik); 
+            line = '<tr><td align="left"><span class="btn btn-link" onclick="showStocks(\'' + filer + '\')">'+ 
+                    filer + '</span>' + 
+                   '</td><td align="left">' + cik +
+                   '</td><td align="left">' + fdate +
+                   '</td><td align="right">'; // + fndscore + '</td></tr>';
+            //$('#dtable2 > tbody:last-child').append(line);
+            f_lines.push(line);
+        }
+
+
+        var mainlnk = 'https://www.sec.gov';
+        var f13FLink = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=[]&type=13F-HR&dateb=&owner=exclude&count=5';
+        for (var xi=0; xi<filers.length; xi++) {
+          try{
+            wsleep(308,1,8);
+            var fs = filers[xi];
+            $('#proc_msg').text('fetching..'+fs);
+            var fa = fs.split('|')
+            var f = fa[0];
+            var c = fa[1]; //cik number
+            //var comp = encodeURI(f)
+            var lnk = f13FLink.replace('\[\]',c);
+            var syms = await get13F(lnk);
+            var lnks = [];
+            var filingDate = [];
+
+            var slen = 0;
+            if (syms === null) {
+               slen = 0; 
+            } else {
+               slen = syms.length;
+            }
+            for (i=0;i<=slen-1;i++) {
+               var val = (syms[i]).split('|');
+               var infoXml_link = await getXMLlink(mainlnk +val[0]); 
+               if (infoXml_link === null) { } else {
+                   lnks.push(mainlnk +infoXml_link[infoXml_link.length-1]);
+                   filingDate.push(val[1]);
+               }  
+            }
+            //console.log(f);
+            //console.log(filingDate);
+
+            var jObj=[]; var j2x=[]; 
+            var nQtrShow = 1;
+            for (ii=nQtrShow; ii>0; ii--) {
+              //console.log('qtrs :' + ii)
+              //console.log('fildate: '+f+ ' = '+ filingDate[ii]);
+              if (typeof filingDate[ii] == "undefined") { break; }
+
+              var jXml;
+                try {
+                    jXml = await getXML2(lnks[ii]);
+                } catch(e) {
+                    console.log('error-000:' + e);
+                } 
+                try {
+
+                  var filDate = convDateInt(filingDate[ii]);
+                  var NoStsFlag = (ii == lnks.length-7);
+                  jObj = xmlToJson(jXml[0],c,filDate,NoStsFlag,f,0);
+                } catch(e) {
+                    console.log('error-001:' + e);
+                } 
+                //try {
+                j2x = []; //clear array
+                var j1 = jObj.length; //maximum stack size
+                for (var i = 0; i < j1; i++) {
+                    var h = (jObj[i]).split(' | '); //sequence : issuer,cusip,value,shares-amount
+                    //console.log(h);
+                    j2x.push(h[1]+'|'+h[0]+'|'+(h[2]).replace(/,/g,'')+'|'+(h[3]).replace(/,/g,'')+'|'+(h[4]).replace(/,/g,''));
+                }    
+            }    
+            j2x.sort();
+
+            //console.log(j2x);
+            var h_sav='',h_ctr=0, mv_tot =0, mv_max=0, sh_max=0;
+            for (var i3=0; i3<j2x.length; i3++) {
+               var h = (j2x[i3]).split('|');
+               if (h[0] != h_sav) {
+                 h_ctr++;
+                 h_sav = h[0];
+               }
+               if (parseInt(h[2])>mv_max) {
+                 mv_max = parseInt(h[2]);
+                 sh_max = parseInt(h[3]);
+               }
+               mv_tot += parseInt(h[2]);
+            }
+            if (mv_max>0 && sh_max>0){
+              var m = mv_max/sh_max;
+              if (m<5) {
+                mv_tot = mv_tot *1000;
+              }
+            }
+
+            if (mv_tot > 0) {
+              //console.log(f + ' #holdings:' + h_ctr +' total mktval:' + mv_tot);
+              var line2 = f_lines[xi]+ h_ctr.toLocaleString("en-US") +'</td><td align="right">'+ mv_tot.toLocaleString("en-US") +'</td></tr>';
+              $('#dtable2 > tbody:last-child').append(line2);
+                //console.log(line2);
+            }  
+          } catch(e) {
+          }  
+        } //for (var xi=0;
+        $('#proc_msg').text('Done.');
+        
+        $('#tab-2').addClass('active');
+        $('#tab-1').removeClass('active');
+        //setTimeout(function() {
+        $('#dtable2').DataTable( {
+            dom: 'Blfrtip',
+            "order": [[ 3, "desc" ]],
+            pageLength: 10,
+            searching: true,
+            paging: true,
+            destroy: true,
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+        });
+
+    }
+
+    async function getLFtable() {
+        var tabrow = [];
+        for (var i=0; i<1; i++) {
+            uri = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&CIK=&type=13F-HR&company=&dateb=&owner=include&start='+(i*20)+'&count=20&output=atom';
+            $('#proc_msg').text('fetching..'); 
+            try {
+                var res = '';
+                var jXml = await getXML2(uri);
+                //var jObj = xmlToJson(jXml[0],CIKnum,filDate,NoStsFlag,arrComp[x],fndscore_ctr);
+                xmlDoc = $.parseXML( jXml[0] );
+                xml2   = $( xmlDoc );
+                var startFlag = 0; 
+                xml2.find('*').map( function(v,i) {
+                    if (startFlag == 1) {
+                        if (this.nodeName == 'title' && (this.textContent).indexOf('13F-HR')>-1 ) {
+                            res += this.textContent + '|';
+                        }
+                        if (this.nodeName == 'updated' ||  this.nodeName == 'id' ) {
+                            res += this.textContent + '|';
+                        }
+                    }
+                    if (this.nodeName == 'entry' || (this.nodeName).indexOf('entry') > -1) {
+                        startFlag = 1;
+                        if (res!='') {
+                            tabrow.push(res); 
+                            res = '';
+                        }  
+                    }                
+                }).get();
+                   
+            }
+            catch (e) {
+                console.log('getLatestFilers err:' + e);
+            }
+          break;
+        }
+        return tabrow;   
+    }
+
+
+    //startup main function
+        $(function() {    
+
+         $('#t1').click(function() {
+            console.log('clicked t1');
+            $('#t1').addClass('active');
+            $('#t2').removeClass('active');
+            $('#t3').removeClass('active');
+            $('#tab-1').addClass('active');
+            $('#tab-2').removeClass('active');
+         });    
+         $('#t2').click(function(){
+            console.log('clicked t2');
+            $('#t2').addClass('active');
+            $('#t1').removeClass('active');
+            $('#t3').removeClass('active');
+            $('#tab-2').addClass('active');
+            $('#tab-1').removeClass('active');            
+            getLatestFilers();
+         });
+
+
+        $("#searchFund").autocomplete({
+          source: availableTags
+        });
+
+            console.log('step1 - load xref arrays');
+            loadXrefArray();
+
+            $("#btnSearch").click(function() {
+              getAsync();
+              $('#t1').click();
+            });
+
+            // $('#bestperf > li').click(function() { 
+            //   $('#bestperf > li').removeClass('active'); 
+            //   $(this).addClass('active'); 
+            //   var f = $('#bestperf > li.active').text();
+            //   var posn1 = f.indexOf('[');
+            //   whale = (whale.substr(0, posn1)).trim();
+            //   $('#searchFund').val(f);
+            //   $('#btnSearch').click();
+            // });
+
+            var symb = ''; //getParameterByName('sym');
+            $('#symbol').html('Fund Holdings');
+            var curr_date = new Date();
+            
+            ask_limit = parseInt(getParameterByName('limit'));
+            strikeprc_limit = parseInt(getParameterByName('prc'));
+
+            if (ask_limit==null || isNaN(ask_limit)) {
+                ask_limit = 30;
+            }            
+            if (strikeprc_limit==null || isNaN(strikeprc_limit)) {
+                strikeprc_limit = 500;
+            }            
+
+
+            if ( $.fn.DataTable.isDataTable('#dtable1') ) {
+                $('#dtable1').DataTable().destroy();
+            }
+            $('#dtable1 tbody').empty();
+            $('#dtable1 thead').empty();
+            jQuery.ajaxSetup({
+                async: true,
+                dataType: 'text'
+            });
+
+            var rowx = '<tr>' +
+                       '<th>Wh</th>' +
+                       '<th>CIK</th>' +
+                       '<th>Company</th>' +
+                       '<th>FilingDate</th>' +
+                       '<th>Holdings</th>' +
+                       '</tr>';
+            $('#dtable1 > thead:last').append(rowx);
+
+            //data table for latest filings
+            if ( $.fn.DataTable.isDataTable('#dtable2') ) {
+                $('#dtable2').DataTable().destroy();
+            }
+            $('#dtable2 tbody').empty();
+            $('#dtable2 thead').empty();
+            jQuery.ajaxSetup({
+                async: true,
+                dataType: 'text'
+            });
+
+            var rowx = '<tr>' +
+                       '<th>Filer</th>' +
+                       '<th>Filing Date</th>' +
+                       '<th>FScore</th>' +
+                       '</tr>';
+            $('#dtable2 > thead:last').append(rowx);
+
+
+
+            //------------------------------------------------------------------------------------- 
+            async function getAsync() {     
+
+                //reset data table 
+                if ( $.fn.DataTable.isDataTable('#dtable1') ) {
+                    $('#dtable1').DataTable().destroy();
+                }
+                $('#dtable1 tbody').empty();
+                $('#dtable1 thead').empty();
+                jQuery.ajaxSetup({
+                    async: true,
+                    dataType: 'text'
+                });
+                var rowx = '<tr>' +
+                           '<th>Fund</th>' +
+                           '<th>FilingDate</th>' +
+                           '<th>Issuer</th><th>Cusip</th>'+
+                           '<th>Mkt Val<br/><span class="label label-success m-l-5"  id="totMktVal"></span></th>' + 
+                           '<th>Shr /Amt</th><th>Avg Prc/Shr</th><th>% Investm</th>'+
+                           '<th>Type</th><th>UpDown</th><th>% Change</th></tr>';
+                $('#dtable1 > thead:last').append(rowx);
+
+                var arrComp = []; //topComp;
+                CIK_Hist = [];
+                arrComp.push(($('#searchFund').val()));  
+                if (arrComp[0] == null) {
+                  console.log('search argument is null');
+                  return;
+                }
+
+                console.log('step3');
+                var line = '';
+                var numLinks = 10;
+                var numQtrShow = 0; //this number is the number of qters to show 
+                numQtrShow = $('#numFilings').val();
+                console.log('qtrs:'+numQtrShow);
+                if (isNaN(numQtrShow)) { numQtrShow = 2; }
+
+                var mainlnk = 'https://www.sec.gov';
+                var f13FLink = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=[]&type=13F-HR&dateb=&owner=exclude&count='+numLinks;
+                var ctrline = 0;
+
+                var acmp = arrComp.length;  
+                for (x=0;x<=acmp-1;x++) {
+
+                    console.log('comp: '+ arrComp[x]);
+                    if (((arrComp[x])+' ').trim() ==='') { continue; }
+
+                    var fndscore_ctr = 1;
+                    if (x > 2) { break;}
+
+                    $('#searchFund').val(arrComp[x]);
+                    document.title = 'FundHoldings_'+ arrComp[x] + '_' + curr_date.yyyymmdd();
+                    var comp = encodeURI(arrComp[x])
+                    var uri = 'https://www.sec.gov/cgi-bin/browse-edgar?company=' + comp + '&owner=exclude&action=getcompany';
+                    
+                    cikScore = getFScoreXref((arrComp[x]).trim());
+                    $('#symbol').html('Holdings');
+
+                    var cik = null; //getCIKXref((arrComp[x]).trim());
+                    var CIKnum = '';
+                    if (!isNaN(arrComp[x])) { //if cik number is provided in the search value 
+                      cik = arrComp[x];
+                      CIKnum = cik;
+                    } else {
+                      if (cik == null) {
+                        CIKnum = await getCIK_New(uri,comp);
+                          if (CIKnum == null || isNaN(CIKnum)) {
+                             comp = comp.replace('COMPANY','CO');
+                             uri = 'https://www.sec.gov/cgi-bin/browse-edgar?company=' + comp + '&owner=exclude&action=getcompany';
+                             CIKnum = await getCIK(uri,comp); 
+                          }
+                      } else {
+                        CIKnum = cik;
+                      }
+                    }
+                    if (CIKnum === '') { continue;} 
+
+                    var lnk = f13FLink.replace('\[\]',CIKnum);
+                    var syms = await get13F(lnk);
+                    var lnks = [];
+                    var filingDate = [];
+
+                    var slen = 0;
+                    if (syms === null) {
+                       slen = 0; 
+                    } else {
+                       slen = syms.length;
+                    }
+                    for (i=0;i<=slen-1;i++) {
+                       var val = (syms[i]).split('|');
+                       var method = 2;
+                       if (method == 1) {
+                         var n = val[0].lastIndexOf('\/');
+                         if (n > 0) { 
+                           lnks.push(mainlnk+val[0].slice(0,n) + '\/'); 
+                           filingDate.push(val[1]); 
+                         } 
+                     }else{
+                           var infoXml_link = await getXMLlink(mainlnk +val[0]); 
+                           if (infoXml_link === null) { } else {
+                             lnks.push(mainlnk +infoXml_link[infoXml_link.length-1]);
+                             filingDate.push(val[1]);
+                           }  
+                     }     
+                    }
+
+                    var subtabName = 'T' + CIKnum;
+                    var subtable = '';
+                    var subtable2 = '';
+                    var jObj = []; var jObj2 = []; var jObj3 = [];
+                    for (ii=numQtrShow; ii>=0; ii--) {
+                      var jXml;
+                      try {
+                            jXml = await getXML2(lnks[ii]);
+                        } catch(e) {
+                            console.log('error-000:' + e);
+                        } 
+                        try {
+                          var filDate = convDateInt(filingDate[ii]);
+                          var NoStsFlag = (ii == lnks.length-7);
+                          jObj = xmlToJson(jXml[0],CIKnum,filDate,NoStsFlag,arrComp[x],fndscore_ctr);
+                        } catch(e) {
+                            console.log('error-001:' + e);
+                        } 
+                        try {
+                            jObj2 = []; //clear array
+                            var j1 = jObj.length; //maximum stack size
+                            for (var i = 0; i < j1; i++) {
+                                var h = (jObj[i]).split(' | '); //sequence : issuer,cusip,value,shares-amount
+                                //console.log(h);
+                                jObj2.push(h[1]+'_'+h[4]+'|'+h[0]+'|'+(h[2]).replace(/,/g,'')+'|'+(h[3]).replace(/,/g,'')+'|'+(h[4]).replace(/,/g,''));
+                            }
+                            jObj2.sort();
+
+                            //compress and sum up same cusip
+                            jObj3 = []; //clear array
+                            var sav_cusip = ''; var sav_issuer = ''; 
+                            var sav_value = 0; var sav_sharesamt = 0; 
+                            var sav_sharestype = '';
+
+
+                            var j2 = jObj2.length;  
+                            for (var i = 0; i < j2; i++) {
+                                var h = (jObj2[i]).split('|'); //sequence :cusip,issuer,value,shares-amount
+                                //console.log(h);
+                                $('#proc_msg').text('fetching..'+h[0]);
+                                if (h[0]!= sav_cusip) {
+                                    if (i > 0) { 
+                                        jObj3.push(CIKnum+'|'+filingDate[ii]+'|'+sav_issuer+'|'+sav_cusip+'|'+sav_value+'|'+sav_sharesamt+'|'+sav_sharestype);
+
+                                        CIK_Hist.push(CIKnum+'|'+filingDate[ii]+'|'+sav_issuer+'|'+sav_cusip+'|'+sav_value+'|'+sav_sharesamt+'|'+sav_sharestype);
+                                    }
+                                    sav_cusip = h[0]; 
+                                    sav_issuer = h[1]; 
+                                    sav_value = parseInt(h[2]); 
+                                    sav_sharesamt = parseInt(h[3]); 
+                                    sav_sharestype = h[4]; 
+                                } else {
+                                    //if (h[4] == 'SH'){
+                                        sav_value += parseInt(h[2]); 
+                                        sav_sharesamt += parseInt(h[3]); 
+                                    //}
+                                }
+
+                                if (i == j2-1) {    
+                                    jObj3.push(CIKnum+'|'+filingDate[ii]+'|'+sav_issuer+'|'+sav_cusip+'|'+sav_value+'|'+sav_sharesamt+'|'+sav_sharestype);
+                                    CIK_Hist.push(CIKnum+'|'+filingDate[ii]+'|'+sav_issuer+'|'+sav_cusip+'|'+sav_value+'|'+sav_sharesamt+'|'+sav_sharestype);
+                                }
+                            }
+
+                            jObj3.sort();
+
+                        } catch(e) {
+                            console.log('error-002:' + e);
+                        } 
+                        try {
+
+                                //add up/down button label
+                                var TotShrsAmt = 1;
+                                for (var i = 0; i < jObj3.length; i++) {
+                                    var h = (jObj3[i]).split('|'); 
+                                    //console.log(h);
+                                    TotShrsAmt += parseInt(h[4]);
+                                }
+
+                                jObj = [];
+                                var j3 = jObj3.length; //maximum stack size
+                                for (var i = 0; i < j3; i++) {
+                                    var upDown = '';
+                                    //if (ii != lnks.length-7) { 
+                                        upDown = isShareUpDown(jObj3[i]);
+                                    //}
+                                    upDown = upDown.replace('%','');
+
+                                    var upDownLbl = ''; 
+                                    if (upDown.indexOf('UpQ')>-1) {
+                                       upDown = upDown.replace(' ','|');
+                                       upDownLbl = ' <span class="label label-success m-l-5">' + upDown + '</span>';
+                                    } else if (upDown.indexOf('DownQ')>-1) {
+                                       upDown = upDown.replace(' ','|-'); 
+                                       upDownLbl = ' <span class="label label-danger m-l-5">' + upDown + '</span>';
+                                    } else if (upDown.indexOf('NewQ')>-1) {
+                                       upDownLbl = ' <span class="label label-primary m-l-5">' + upDown + '</span> | 100';
+                                    } else {
+                                       upDownLbl = ' <span class="label label-default m-l-5">' + upDown + '</span> | 0';
+                                    }
+
+                                    var h = (jObj3[i]).split('|'); 
+                                    jObj.push((h[2])+'|'+
+                                               h[3]+'|'+
+                                               (parseInt(h[4])).toFixed(0) +'|'+
+                                               (parseInt(h[5])).toFixed(0) +'|'+
+                                               (((parseInt(h[4])/TotShrsAmt)*100).toFixed(3))+' |'+h[6]+'|'+upDownLbl);
+
+                                }
+                                jObj.sort();
+
+
+                        } catch(e) {
+                            console.log('error-003:' + e);
+                        } 
+
+                        //add items that were sold all from previous quarter
+                        //elements: issuer,cusip,value,shares-amount,%invest,type,%change 
+                        var jObj4 =addSoldAllItems(jObj,filingDate[ii]);
+                        jObj4.sort();
+                        jObj = []; //clear array
+                        for (var i=0; i<jObj4.length; i++) {
+                            jObj.push(jObj4[i]);
+                        }
+
+                        try {
+                          var symbol = '';
+                          var holdings = '';
+                          var fetchobjlimit = 5000;
+
+                          try {
+                            var max_cik='',max_v=0,max_s = 0,tmp_v =0, tmp_s = 0;
+                            for (var i=0; i<jObj.length; i++) {
+                               var h01 = (jObj[i]).split('|');                               
+                               var tmp_v = parseInt(h01[2]);
+                               if (isNaN(tmp_v)) {tmp_v=0}
+                               if (tmp_v > max_v) {
+                                 max_v = tmp_v;
+                                 max_s = parseInt(h01[3]);
+                                 max_cik = h01[1];
+                                 //0=AIRBNB INC|1=009066101|2=115|3=683|4=0.00 |5=SH-|6=NewQ|7=100.01
+                               }
+                            }
+                            console.log('max found: ' + max_cik + ' | ' + max_v + ' | ' + max_s);
+                            var tot_mkt = 0, mult=1, mktval=0, costPerShr=0;
+                            tmp_v = max_v/max_s;
+                            if (tmp_v < 5) { mult = 1000 } else { mult = 1 }
+                              for (var i=0; i<jObj.length; i++) {
+                                 var h02 = (jObj[i]).split('|');
+                                 mktval = parseInt(h02[2])*mult;
+                                 costPerShr = (mktval/parseInt(h02[3])).toFixed(2);
+                                 if (isNaN(costPerShr)) {costPerShr=0;}
+                                 tot_mkt += mktval;
+
+                                 var cusip_trunc = (h02[1]).split('_');
+                                 $('#proc_msg').text('fetching..'+cusip_trunc[0]); 
+                                 jObj[i] = (h02[0]).replace(/,/g,'') +'|<button type="button" class="btn btn-default  btn-xs" onclick="window.open(\'https://www.openfigi.com/search\#\!\?simpleSearchString='+cusip_trunc[0]+'\', \'_blank\');" >'+
+                                  cusip_trunc[0]+
+                                 '</button>|'+mktval+'|'+h02[3]+'|'+costPerShr+'|'+h02[4]+'|'+h02[5]+'|'+h02[6]+'|'+h02[7];
+                              }
+                              $('#totMktVal').html(tot_mkt.toLocaleString("en-US"));
+                          }catch(e){ 
+                            console.log('remap err: '+e)
+                          }
+
+                        for (var i = 0; i < jObj.length; i++) {
+                            if (fndscore_ctr == 1 && ii < numQtrShow) {    
+                               if (typeof jXml[1] != "undefined") {
+                                 var xl1 = '';
+                                 var flgDte = filingDate[ii];
+                                 try { xl1 = jXml[1]; 
+                                 } catch(e) {console.log('err link 2:' + e)}
+                                 // if ((jObj[i]).indexOf('Sold All')>-1) {
+                                 //    try {
+                                 //      flgDte = filingDate[ii+1];
+                                 //      xl1 = lnks[ii+1];
+                                 //    } catch(e){ }
+                                 // }
+                                  holdings += '<tr><td align="left">' + (arrComp[x]).replace(/,/g,'') + 
+                                 '</td><td align="left">' + ' <button type="button" class="btn btn-default  btn-xs" onclick="window.open(\''+xl1+'\', \'_blank\');" >'+ flgDte +'</button>|' + jObj[i] + '</tr>';                                        
+                                 //'<td><a href="https://stockanalysis.com/stocks/' + symbol + '" target="_blank">' + symbol + '</a> | ' + jObj[i] + '</tr>';
+
+                                 holdings = holdings.replace(/\|/g,'</td><td align="right">');
+                               }     
+                            }  
+                        }
+
+                        var TotalInvested = (parseInt(TotShrsAmt)).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+                        ctrline++;
+                         if (fndscore_ctr == 1 && ii < numQtrShow) { 
+                            if (typeof jXml[1] != "undefined") {  //skip all other quarters except recent
+                              $('#dtable1 > tbody:last-child').append(holdings);
+                            } 
+                         }     
+                      } catch(e) {
+                          console.log('error-004:' + e);
+                      } 
+                    }                  
+
+                    fndscore_ctr++;
+                    $('#tab-1').addClass('active');
+                    $('#tab-2').removeClass('active');
+                    var fmsg = $('#proc_msg').text();
+                    if (fmsg.indexOf('fetch') > -1) {
+                        $('#proc_msg').text('Done.');
+                    } else {    
+                      $('#proc_msg').text('CORS Required'); 
+                    }  
+                }
+
+                $('#dtable1').DataTable( {
+                    dom: 'Blfrtip',
+                    "order": [[ 1, "desc" ],[ 4, "desc" ]],
+                    pageLength: 10,
+                    searching: true,
+                    paging: true,
+                    destroy: true,
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                });
+
+            }
+            //AutoRun
+            getAsync();   
+        });
+
+
+</script>
+</body>
+</html>
